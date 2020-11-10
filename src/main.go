@@ -12,9 +12,7 @@ import (
 func main() {
 
 	var rd my_gocache.ICache = my_gocache.Redis{Host: "35.247.157.146", Port: "16379", Password: "scte1234"}
-
 	rd.Connect()
-
 	myMap := make(map[string]string)
 
 	myMap["country"] = "Vietnam"
