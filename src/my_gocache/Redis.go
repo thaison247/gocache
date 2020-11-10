@@ -3,11 +3,13 @@ package my_gocache
 import (
 	// "log"
 	// Import the redigo/redis package.
+	"fmt"
+
 	"github.com/gomodule/redigo/redis"
 )
 
 var (
-	// CSConn: Connector
+	// CSConn: connector to redis server
 	CSConn *redis.Conn
 )
 
@@ -61,4 +63,21 @@ func (r Redis) Delete(key string) error {
 	}
 
 	return nil
+}
+
+// Close connection
+func (r Redis) Close() {
+	(*CSConn).Close()
+}
+
+// set expire time on a key
+func (r Redis) Expire(key string, expireTime int) (interface{}, error) {
+	val, err := (*CSConn).Do("EXPIRE", key, expireTime)
+	if err != nil {
+		fmt.Println("err: ", err)
+		return nil, err
+	} else {
+		fmt.Println("val: ", val)
+		return val, nil
+	}
 }

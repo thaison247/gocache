@@ -12,4 +12,10 @@ type ICache interface {
 
 	//
 	Delete(key string) error
+
+	//
+	Close()
+
+	// set expire time on a key
+	Expire(key string, expireTime int) (interface{}, error)
 }
