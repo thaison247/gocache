@@ -38,5 +38,4 @@ func TestSet(t *testing.T) {
 	} else {
 		t.Logf("Delete by Delete(\"country\") success")
 	}
-
 }

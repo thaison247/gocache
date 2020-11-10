@@ -23,11 +23,19 @@ func (r Redis) Connect() error {
 }
 
 // Set method
-func (r Redis) Set(key string, value interface{}) error {
+func (r Redis) Set(key string, value interface{}, expireTime ...int) error {
 	_, err := (*CSConn).Do("SET", key, value)
 
 	if err != nil {
 		return err
+	}
+
+	// set expire time on key
+	if len(expireTime) > 0 {
+		_, err = (*CSConn).Do("EXPIRE", key, expireTime[0])
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

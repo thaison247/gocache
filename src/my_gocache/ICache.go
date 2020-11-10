@@ -5,7 +5,7 @@ type ICache interface {
 	Connect() error
 
 	//
-	Set(key string, value interface{}) error
+	Set(key string, value interface{}, exprireTime ...int) error
 
 	//
 	Get(key string) (interface{}, error)

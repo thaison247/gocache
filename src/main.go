@@ -13,13 +13,14 @@ func main() {
 
 	var rd my_gocache.ICache = my_gocache.Redis{Host: "35.247.157.146", Port: "16379", Password: "scte1234"}
 	rd.Connect()
+
 	myMap := make(map[string]string)
 
 	myMap["country"] = "Vietnam"
 	myMap["district"] = "Phu Nhuan"
 	myMap["city"] = "Ho Chi Minh City"
 
-	err := rd.Set("address", myMap)
+	err := rd.Set("address", myMap, 200)
 	if err != nil {
 		log.Fatal(err)
 	}
