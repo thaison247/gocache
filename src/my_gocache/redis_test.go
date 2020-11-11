@@ -36,8 +36,9 @@ func TestRedisSet(t *testing.T) {
 	}
 
 	type expectedRes struct {
-		value    interface{}
-		errorMsg error
+		value      interface{}
+		errorMsg   error
+		expireTime int
 	}
 
 	type testCase struct {
@@ -48,11 +49,10 @@ func TestRedisSet(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name: "TC1: set value for a new key without expire time",
+			name: "TC1:set value for a new key without expire time",
 			args: args{
 				key:   "country",
 				value: "Vietnam",
-				// expireTime: make([]int, 1){20}
 			},
 			expectedRes: expectedRes{
 				value:    "Vietnam",
@@ -78,25 +78,27 @@ func TestRedisSet(t *testing.T) {
 				expireTime: []int{20},
 			},
 			expectedRes: expectedRes{
-				value:    "Hai Phong City",
-				errorMsg: nil,
+				value:      "Hai Phong City",
+				errorMsg:   nil,
+				expireTime: 20,
 			},
 		},
 		{
-			name: "TC4: set value for a new key with negative expire time",
+			name: "TC4:set value for a new key with negative expire time",
 			args: args{
 				key:        "city_2",
-				value:      "Ho Chi Minh City",
+				value:      "Ho Chi Mih City",
 				expireTime: []int{-2},
 			},
 			expectedRes: expectedRes{
-				value:    nil,
-				errorMsg: nil,
+				value:      nil,
+				errorMsg:   nil,
+				expireTime: -2,
 			},
 		},
 	}
 
-	// iterate to execute all test case
+	// iterate to execute all tes case
 	for index, tc := range testCases {
 		fmt.Printf("%d - ", index+1)
 

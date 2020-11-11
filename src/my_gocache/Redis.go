@@ -3,6 +3,9 @@ package my_gocache
 import (
 	// "errors"
 
+	"errors"
+	"fmt"
+
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -38,6 +41,10 @@ func (r Redis) Set(key string, value interface{}, expireTime ...int) error {
 		if err != nil {
 			return err
 		}
+
+		time, _ := (*CSConn).Do("TTL", key)
+
+		fmt.Printf("Expiretime: %d", time)
 	}
 
 	return nil
@@ -81,7 +88,7 @@ func (r Redis) ExpireV2(key string, expireTime int) error {
 	val, err := (*CSConn).Do("EXPIRE", key, expireTime)
 
 	if val == 0 {
-		return err
+		return errors.New("Invalid key")
 	}
 
 	return err

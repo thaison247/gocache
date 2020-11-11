@@ -21,4 +21,7 @@ type ICache interface {
 
 	// set expire
 	ExpireV2(key string, expireTime int) error
+
+	// get remain time life (expiretime)
+	GetRemainLifeTime(key string) (int64, error)
 }
