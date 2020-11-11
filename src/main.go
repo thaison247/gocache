@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"my_gocache"
 )
 
@@ -34,10 +33,26 @@ func main() {
 	// 	fmt.Println(dat)
 	// }
 
-	val, err2 := rd.Expire("address", 20)
-	if err2 != nil {
-		log.Fatal(err2)
+	// val, err2 := rd.Expire("address", 20)
+	// if err2 != nil {
+	// 	log.Fatal(err2)
+	// } else {
+	// 	fmt.Println(val)
+	// }
+
+	// res, err := rd.Delete("city")
+
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+	// 	fmt.Println("res: ", res)
+	// }
+
+	res, err := rd.Expire("city", 20)
+	if err != nil {
+		fmt.Println(err)
 	} else {
-		fmt.Println(val)
+		fmt.Println("res: ", res)
 	}
+
 }

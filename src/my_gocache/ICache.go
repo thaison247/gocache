@@ -11,7 +11,7 @@ type ICache interface {
 	Get(key string) (interface{}, error)
 
 	//
-	Delete(key string) error
+	Delete(key string) (int64, error)
 
 	//
 	Close()

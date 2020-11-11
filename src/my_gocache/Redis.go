@@ -1,10 +1,6 @@
 package my_gocache
 
 import (
-	// "log"
-	// Import the redigo/redis package.
-	"fmt"
-
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -16,16 +12,18 @@ var (
 // Connect to redis server
 func (r Redis) Connect() error {
 	conn, err := redis.Dial("tcp", r.Host+":"+r.Port, redis.DialPassword(r.Password))
+
 	if err != nil {
 		return err
-	} else {
-		CSConn = &conn
-		return nil
 	}
+
+	CSConn = &conn
+	return nil
 }
 
 // Set method
 func (r Redis) Set(key string, value interface{}, expireTime ...int) error {
+	// set key - value
 	_, err := (*CSConn).Do("SET", key, value)
 
 	if err != nil {
@@ -55,14 +53,10 @@ func (r Redis) Get(key string) (interface{}, error) {
 }
 
 // Delete method
-func (r Redis) Delete(key string) error {
-	_, err := (*CSConn).Do("DEL", key)
+func (r Redis) Delete(key string) (int64, error) {
+	result, err := (*CSConn).Do("DEL", key)
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return result.(int64), err
 }
 
 // Close connection
@@ -73,11 +67,10 @@ func (r Redis) Close() {
 // set expire time on a key
 func (r Redis) Expire(key string, expireTime int) (interface{}, error) {
 	val, err := (*CSConn).Do("EXPIRE", key, expireTime)
+
 	if err != nil {
-		fmt.Println("err: ", err)
 		return nil, err
-	} else {
-		fmt.Println("val: ", val)
-		return val, nil
 	}
+
+	return val.(int64), nil
 }
