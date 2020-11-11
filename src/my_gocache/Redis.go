@@ -4,7 +4,6 @@ import (
 	// "errors"
 
 	"errors"
-	"fmt"
 
 	"github.com/gomodule/redigo/redis"
 )
@@ -42,9 +41,10 @@ func (r Redis) Set(key string, value interface{}, expireTime ...int) error {
 			return err
 		}
 
-		time, _ := (*CSConn).Do("TTL", key)
-
-		fmt.Printf("Expiretime: %d", time)
+		_, err = (*CSConn).Do("TTL", key)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -92,4 +92,23 @@ func (r Redis) ExpireV2(key string, expireTime int) error {
 	}
 
 	return err
+}
+
+// get remain time life (expiretime)
+func (r Redis) GetRemainLifeTime(key string) (int64, error) {
+	val, err := (*CSConn).Do("TTL", key)
+
+	if err != nil {
+		return 0, err
+	}
+
+	if val.(int64) == -1 {
+		return val.(int64), errors.New("This key has no expiration time")
+	}
+
+	if val.(int64) == -2 {
+		return val.(int64), errors.New("Invalid key")
+	}
+
+	return val.(int64), err
 }

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"my_gocache"
 )
 
@@ -15,15 +15,23 @@ func main() {
 
 	defer rd.Close()
 
-	myMap := make(map[string]string)
+	// myMap := make(map[string]string)
 
-	myMap["country"] = "Vietnam"
-	myMap["district"] = "Phu Nhuan"
-	myMap["city"] = "Ho Chi Minh City"
+	// myMap["country"] = "Vietnam"
+	// myMap["district"] = "Phu Nhuan"
+	// myMap["city"] = "Ho Chi Minh City"
 
-	err := rd.Set("address", myMap, 20)
-	if err != nil {
-		log.Fatal(err)
+	// err := rd.Set("address", myMap, 20)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	val, err1 := rd.GetRemainLifeTime("address")
+	if err1 != nil {
+		fmt.Println("Error: ", err1)
+	} else {
+
+		fmt.Println("Remain time: ", val)
 	}
 
 	// dat, err1 := rd.Get("address")

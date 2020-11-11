@@ -55,8 +55,9 @@ func TestRedisSet(t *testing.T) {
 				value: "Vietnam",
 			},
 			expectedRes: expectedRes{
-				value:    "Vietnam",
-				errorMsg: nil,
+				value:      "Vietnam",
+				errorMsg:   nil,
+				expireTime: -1,
 			},
 		},
 		{
@@ -66,8 +67,9 @@ func TestRedisSet(t *testing.T) {
 				value: "Japan",
 			},
 			expectedRes: expectedRes{
-				value:    "Japan",
-				errorMsg: nil,
+				value:      "Japan",
+				errorMsg:   nil,
+				expireTime: -1,
 			},
 		},
 		{
@@ -88,7 +90,7 @@ func TestRedisSet(t *testing.T) {
 			args: args{
 				key:        "city_2",
 				value:      "Ho Chi Mih City",
-				expireTime: []int{-2},
+				expireTime: []int{-20},
 			},
 			expectedRes: expectedRes{
 				value:      nil,
@@ -112,13 +114,18 @@ func TestRedisSet(t *testing.T) {
 		}
 
 		// check wrong value
-		if val, err := RConn.Get(tc.args.key); val != tc.expectedRes.value {
+		if val, err1 := RConn.Get(tc.args.key); val != tc.expectedRes.value {
 			t.Errorf("Fail at [%s], expected value = %v, get value = %v\n", tc.name, tc.expectedRes.value, val)
-			t.Errorf("Error message: %s\n", err)
+			t.Errorf("Error message: %s\n", err1)
 			continue
 		}
 
 		// check expire time
+		if remainTime, err2 := RConn.GetRemainLifeTime(tc.args.key); int(remainTime) != tc.expectedRes.expireTime {
+			t.Errorf("Fail at [%s], expected expire time = %v, get expire time = %v\n", tc.name, tc.expectedRes.value, remainTime)
+			t.Errorf("Error message: %s\n", err2)
+			continue
+		}
 
 		// show PASS message if we pass all above check
 		fmt.Printf("%s: PASS\n", tc.name)
