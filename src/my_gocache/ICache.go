@@ -10,7 +10,7 @@ type ICache interface {
 	//
 	Get(key string) (interface{}, error)
 
-	//
+	// delete a key
 	Delete(key string) (int64, error)
 
 	//
@@ -18,4 +18,7 @@ type ICache interface {
 
 	// set expire time on a key
 	Expire(key string, expireTime int) (interface{}, error)
+
+	// set expire
+	ExpireV2(key string, expireTime int) error
 }
