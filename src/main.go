@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"my_gocache"
 )
 
@@ -14,60 +13,5 @@ func main() {
 	rd.Connect()
 
 	defer rd.Close()
-
-	numb, err := rd.GetRemainLifeTime("")
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-	} else {
-		fmt.Printf("Number: %d\n", numb)
-	}
-
-	// myMap := make(map[string]string)
-
-	// myMap["country"] = "Vietnam"
-	// myMap["district"] = "Phu Nhuan"
-	// myMap["city"] = "Ho Chi Minh City"
-
-	// err := rd.Set("address", myMap, 20)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// val, err1 := rd.GetRemainLifeTime("address")
-	// if err1 != nil {
-	// 	fmt.Println("Error: ", err1)
-	// } else {
-
-	// 	fmt.Println("Remain time: ", val)
-	// }
-
-	// dat, err1 := rd.Get("address")
-	// if err1 != nil {
-	// 	log.Fatal(err1)
-	// } else {
-	// 	fmt.Println(dat)
-	// }
-
-	// val, err2 := rd.Expire("address", 20)
-	// if err2 != nil {
-	// 	log.Fatal(err2)
-	// } else {
-	// 	fmt.Println(val)
-	// }
-
-	// res, err := rd.Delete("city")
-
-	// if err != nil {
-	// 	fmt.Println(err)
-	// } else {
-	// 	fmt.Println("res: ", res)
-	// }
-
-	// res, err := rd.Expire("city", 20)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// } else {
-	// 	fmt.Println("res: ", res)
-	// }
 
 }
