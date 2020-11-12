@@ -74,25 +74,25 @@ func (r Redis) Close() {
 }
 
 // set expire time on a key
-func (r Redis) Expire(key string, expireTime int) (interface{}, error) {
+func (r Redis) Expire(key string, expireTime int) (int64, error) {
 	val, err := (*CSConn).Do("EXPIRE", key, expireTime)
 
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 
 	return val.(int64), nil
 }
 
-func (r Redis) ExpireV2(key string, expireTime int) error {
-	val, err := (*CSConn).Do("EXPIRE", key, expireTime)
+// func (r Redis) ExpireV2(key string, expireTime int) error {
+// 	val, err := (*CSConn).Do("EXPIRE", key, expireTime)
 
-	if val == 0 {
-		return errors.New("Invalid key")
-	}
+// 	if val == 0 {
+// 		return errors.New("Invalid key")
+// 	}
 
-	return err
-}
+// 	return err
+// }
 
 // get remain time life (expiretime)
 func (r Redis) GetRemainLifeTime(key string) (int64, error) {

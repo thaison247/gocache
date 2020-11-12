@@ -19,10 +19,11 @@ type ICache interface {
 	Close()
 
 	// set expire time on a key
-	Expire(key string, expireTime int) (interface{}, error)
+	// returns: number of affected key (1 | 0):
+	Expire(key string, expireTime int) (int64, error)
 
 	// set expire
-	ExpireV2(key string, expireTime int) error
+	// ExpireV2(key string, expireTime int) error
 
 	// get remain time life (expiretime)
 	GetRemainLifeTime(key string) (int64, error)

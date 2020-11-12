@@ -15,20 +15,11 @@ func main() {
 
 	defer rd.Close()
 
-	rd.Set("", "20", 20)
-
-	val, err := rd.Get("test1")
+	numb, err := rd.Expire("te", 20)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("Error: %v\n", err)
 	} else {
-		fmt.Println(val)
-	}
-
-	val2, err2 := rd.Get("")
-	if err != nil {
-		fmt.Println(err2)
-	} else {
-		fmt.Println(val2)
+		fmt.Printf("Number: %d\n", numb)
 	}
 
 	// myMap := make(map[string]string)
