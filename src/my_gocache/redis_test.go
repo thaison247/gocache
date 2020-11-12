@@ -183,7 +183,7 @@ func TestRedisGet(t *testing.T) {
 			},
 		},
 		{
-			name: "TC2: get value by an invalide key",
+			name: "TC2: get value by an invalid key",
 			args: args{
 				key: "testKey0",
 			},
@@ -224,6 +224,111 @@ func TestRedisGet(t *testing.T) {
 		// check returned value
 		if val != tc.expectedRes.value {
 			t.Errorf("Fail at [%s], expected value = %v, get value = %v\n", tc.name, tc.expectedRes.value, val)
+			t.Errorf("Error message: %s\n", err)
+			continue
+		}
+
+		// check returned error
+		if err == nil {
+			if tc.expectedRes.errorMsg != nil {
+				t.Errorf("Fail at [%s], expected error = %v, get error = %v\n", tc.name, tc.expectedRes.errorMsg, err)
+				continue
+			}
+		} else {
+			// check returned error (error != nil)
+			if err.Error() != tc.expectedRes.errorMsg.Error() {
+				t.Errorf("Fail at [%s], expected error = %v, get error = %v\n", tc.name, tc.expectedRes.errorMsg, err)
+				continue
+			}
+		}
+
+		// show PASS message if we pass all above check
+		fmt.Printf("%s: PASS\n", tc.name)
+	}
+}
+
+func TestRedisDelete(t *testing.T) {
+
+	// Connect to redis server
+	var RConn ICache = Redis{Host: "35.247.157.146", Port: "16379", Password: "scte1234"}
+	RConn.Connect()
+
+	// Close connector
+	defer RConn.Close()
+
+	// set keys-values in advanced
+	RConn.Set("testKey1", "value1")
+	RConn.Set("testKey2", "value2", 1)
+	time.Sleep(time.Second * 2) // wait testKey2 get expired
+
+	type args struct {
+		key string
+	}
+
+	type expectedRes struct {
+		numberOfDeletedKey int64
+		errorMsg           error
+	}
+
+	type testCase struct {
+		name        string
+		args        args
+		expectedRes expectedRes
+	}
+
+	testCases := []testCase{
+		{
+			name: "TC1: delete by a valid key",
+			args: args{
+				key: "testKey1",
+			},
+			expectedRes: expectedRes{
+				numberOfDeletedKey: 1,
+				errorMsg:           nil,
+			},
+		},
+		{
+			name: "TC2: delete by an invalid key",
+			args: args{
+				key: "testKey0",
+			},
+			expectedRes: expectedRes{
+				numberOfDeletedKey: 0,
+				errorMsg:           nil,
+			},
+		},
+		{
+			name: "TC3: delete by an empty key",
+			args: args{
+				key: "",
+			},
+			expectedRes: expectedRes{
+				numberOfDeletedKey: 0,
+				errorMsg:           nil,
+			},
+		},
+		{
+			name: "TC4: get value by an expired key",
+			args: args{
+				key: "testKey2",
+			},
+			expectedRes: expectedRes{
+				numberOfDeletedKey: 0,
+				errorMsg:           nil,
+			},
+		},
+	}
+
+	// iterate to execute all tes case
+	for index, tc := range testCases {
+		fmt.Printf("%d - ", index+1)
+
+		// set key - value - expireTime
+		val, err := RConn.Delete(tc.args.key)
+
+		// check returned value
+		if val != tc.expectedRes.numberOfDeletedKey {
+			t.Errorf("Fail at [%s], expected number of deleted rows = %v, get number of deleted rows = %v\n", tc.name, tc.expectedRes.numberOfDeletedKey, val)
 			t.Errorf("Error message: %s\n", err)
 			continue
 		}

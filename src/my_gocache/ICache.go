@@ -10,7 +10,9 @@ type ICache interface {
 	//
 	Get(key string) (interface{}, error)
 
-	// delete a key
+	// delete a pair of key-value
+	// returns: number of deleted key-value (1 | 0): int64
+	//			error: error
 	Delete(key string) (int64, error)
 
 	//
