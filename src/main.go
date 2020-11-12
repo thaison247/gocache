@@ -15,6 +15,22 @@ func main() {
 
 	defer rd.Close()
 
+	rd.Set("", "20", 20)
+
+	val, err := rd.Get("test1")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(val)
+	}
+
+	val2, err2 := rd.Get("")
+	if err != nil {
+		fmt.Println(err2)
+	} else {
+		fmt.Println(val2)
+	}
+
 	// myMap := make(map[string]string)
 
 	// myMap["country"] = "Vietnam"
@@ -26,13 +42,13 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 
-	val, err1 := rd.GetRemainLifeTime("address")
-	if err1 != nil {
-		fmt.Println("Error: ", err1)
-	} else {
+	// val, err1 := rd.GetRemainLifeTime("address")
+	// if err1 != nil {
+	// 	fmt.Println("Error: ", err1)
+	// } else {
 
-		fmt.Println("Remain time: ", val)
-	}
+	// 	fmt.Println("Remain time: ", val)
+	// }
 
 	// dat, err1 := rd.Get("address")
 	// if err1 != nil {

@@ -1,8 +1,10 @@
 package my_gocache
 
 import (
+	"errors"
 	"fmt"
 	"testing"
+	"time"
 )
 
 // var (
@@ -49,7 +51,7 @@ func TestRedisSet(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name: "TC1:set value for a new key without expire time",
+			name: "TC1: set value for a new key without expire time",
 			args: args{
 				key:   "country",
 				value: "Vietnam",
@@ -86,7 +88,7 @@ func TestRedisSet(t *testing.T) {
 			},
 		},
 		{
-			name: "TC4:set value for a new key with negative expire time",
+			name: "TC4: set value for a new key with negative expire time",
 			args: args{
 				key:        "city_2",
 				value:      "Ho Chi Mih City",
@@ -107,13 +109,21 @@ func TestRedisSet(t *testing.T) {
 		// set key - value - expireTime
 		err := RConn.Set(tc.args.key, tc.args.value, tc.args.expireTime...)
 
-		// check set key error
-		if err != tc.expectedRes.errorMsg {
-			t.Errorf("Fail at [%s], expected error = %v, get error = %v\n", tc.name, tc.expectedRes.errorMsg, err)
-			continue
+		// check returned error
+		if err == nil {
+			if tc.expectedRes.errorMsg != nil {
+				t.Errorf("Fail at [%s], expected error = %v, get error = %v\n", tc.name, tc.expectedRes.errorMsg, err)
+				continue
+			}
+		} else {
+			// check returned error (error != nil)
+			if err.Error() != tc.expectedRes.errorMsg.Error() {
+				t.Errorf("Fail at [%s], expected error = %v, get error = %v\n", tc.name, tc.expectedRes.errorMsg, err)
+				continue
+			}
 		}
 
-		// check wrong value
+		// check returned value
 		if val, err1 := RConn.Get(tc.args.key); val != tc.expectedRes.value {
 			t.Errorf("Fail at [%s], expected value = %v, get value = %v\n", tc.name, tc.expectedRes.value, val)
 			t.Errorf("Error message: %s\n", err1)
@@ -122,13 +132,117 @@ func TestRedisSet(t *testing.T) {
 
 		// check expire time
 		if remainTime, err2 := RConn.GetRemainLifeTime(tc.args.key); int(remainTime) != tc.expectedRes.expireTime {
-			t.Errorf("Fail at [%s], expected expire time = %v, get expire time = %v\n", tc.name, tc.expectedRes.value, remainTime)
+			t.Errorf("Fail at [%s], expected expire time = %v, get expire time = %v\n", tc.name, tc.expectedRes.expireTime, remainTime)
 			t.Errorf("Error message: %s\n", err2)
 			continue
 		}
 
 		// show PASS message if we pass all above check
 		fmt.Printf("%s: PASS\n", tc.name)
+	}
+}
 
+func TestRedisGet(t *testing.T) {
+
+	// Connect to redis server
+	var RConn ICache = Redis{Host: "35.247.157.146", Port: "16379", Password: "scte1234"}
+	RConn.Connect()
+
+	// Close connector
+	defer RConn.Close()
+
+	// set keys-values in advanced
+	RConn.Set("testKey1", "value1")
+	RConn.Set("testKey2", "value2", 1)
+	time.Sleep(time.Second * 2) // wait testKey2 to get expired
+
+	type args struct {
+		key string
+	}
+
+	type expectedRes struct {
+		value    interface{}
+		errorMsg error
+	}
+
+	type testCase struct {
+		name        string
+		args        args
+		expectedRes expectedRes
+	}
+
+	testCases := []testCase{
+		{
+			name: "TC1: get value by a valid key",
+			args: args{
+				key: "testKey1",
+			},
+			expectedRes: expectedRes{
+				value:    "value1",
+				errorMsg: nil,
+			},
+		},
+		{
+			name: "TC2: get value by an invalide key",
+			args: args{
+				key: "testKey0",
+			},
+			expectedRes: expectedRes{
+				value:    nil,
+				errorMsg: errors.New("redigo: nil returned"),
+			},
+		},
+		{
+			name: "TC3: get value by an empty key",
+			args: args{
+				key: "",
+			},
+			expectedRes: expectedRes{
+				value:    nil,
+				errorMsg: errors.New("redigo: nil returned"),
+			},
+		},
+		{
+			name: "TC4: get value by an expired key",
+			args: args{
+				key: "testKey2",
+			},
+			expectedRes: expectedRes{
+				value:    nil,
+				errorMsg: errors.New("redigo: nil returned"),
+			},
+		},
+	}
+
+	// iterate to execute all tes case
+	for index, tc := range testCases {
+		fmt.Printf("%d - ", index+1)
+
+		// set key - value - expireTime
+		val, err := RConn.Get(tc.args.key)
+
+		// check returned value
+		if val != tc.expectedRes.value {
+			t.Errorf("Fail at [%s], expected value = %v, get value = %v\n", tc.name, tc.expectedRes.value, val)
+			t.Errorf("Error message: %s\n", err)
+			continue
+		}
+
+		// check returned error
+		if err == nil {
+			if tc.expectedRes.errorMsg != nil {
+				t.Errorf("Fail at [%s], expected error = %v, get error = %v\n", tc.name, tc.expectedRes.errorMsg, err)
+				continue
+			}
+		} else {
+			// check returned error (error != nil)
+			if err.Error() != tc.expectedRes.errorMsg.Error() {
+				t.Errorf("Fail at [%s], expected error = %v, get error = %v\n", tc.name, tc.expectedRes.errorMsg, err)
+				continue
+			}
+		}
+
+		// show PASS message if we pass all above check
+		fmt.Printf("%s: PASS\n", tc.name)
 	}
 }
