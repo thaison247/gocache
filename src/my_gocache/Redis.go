@@ -3,8 +3,6 @@ package my_gocache
 import (
 	// "errors"
 
-	"errors"
-
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -98,17 +96,17 @@ func (r Redis) Expire(key string, expireTime int) (int64, error) {
 func (r Redis) GetRemainLifeTime(key string) (int64, error) {
 	val, err := (*CSConn).Do("TTL", key)
 
-	if err != nil {
-		return 0, err
-	}
+	// if err != nil {
+	// 	return 0, err
+	// }
 
-	if val.(int64) == -1 {
-		return val.(int64), errors.New("This key has no expiration time")
-	}
+	// if val.(int64) == -1 {
+	// 	return val.(int64), errors.New("This key has no expiration time")
+	// }
 
-	if val.(int64) == -2 {
-		return val.(int64), errors.New("Invalid key")
-	}
+	// if val.(int64) == -2 {
+	// 	return val.(int64), errors.New("Invalid key")
+	// }
 
 	return val.(int64), err
 }

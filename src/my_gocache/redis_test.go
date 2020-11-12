@@ -7,21 +7,6 @@ import (
 	"time"
 )
 
-// var (
-// 	//RConn: Redis connector
-// 	RConn ICache
-// )
-
-// func setUp() {
-// 	var RConn = Redis{
-// 		Host:     "35.247.157.146",
-// 		Port:     "16379",
-// 		Password: "scte134",
-// 	}
-
-// 	RConn.Connect()
-// }
-
 func TestRedisSet(t *testing.T) {
 
 	// Connect to redis server
@@ -349,6 +334,117 @@ func TestRedisDelete(t *testing.T) {
 
 		// show PASS message if we pass all above check
 		fmt.Printf("%s: PASS\n", tc.name)
+
+		// del testing keys-values
+		RConn.Delete("testKey1")
+	}
+}
+
+func TestRedisGetRemainLifeTime(t *testing.T) {
+
+	// Connect to redis server
+	var RConn ICache = Redis{Host: "35.247.157.146", Port: "16379", Password: "scte1234"}
+	RConn.Connect()
+
+	// Close connector
+	defer RConn.Close()
+
+	// set keys-values in advanced
+	RConn.Set("testKey1", "value1", 20)
+	RConn.Set("testKey2", "value2", 25)
+	RConn.Set("teseKey3", "value3")
+	// time.Sleep(time.Second * 2) // wait testKey2 get expired
+
+	type args struct {
+		key string
+	}
+
+	type expectedRes struct {
+		remainTime int64
+		errorMsg   error
+	}
+
+	type testCase struct {
+		name        string
+		args        args
+		expectedRes expectedRes
+	}
+
+	testCases := []testCase{
+		{
+			name: "TC1: get remaining life time of a valid key",
+			args: args{
+				key: "testKey1",
+			},
+			expectedRes: expectedRes{
+				remainTime: 20,
+				errorMsg:   nil,
+			},
+		},
+		{
+			name: "TC2: get remaining life time of an invalid key",
+			args: args{
+				key: "testKey0",
+			},
+			expectedRes: expectedRes{
+				remainTime: -2,
+				errorMsg:   nil,
+			},
+		},
+		{
+			name: "TC3: get remaining life time of an empty key",
+			args: args{
+				key: "",
+			},
+			expectedRes: expectedRes{
+				remainTime: -2,
+				errorMsg:   nil,
+			},
+		},
+		{
+			name: "TC4: get remaining life time of a key which has no expire time",
+			args: args{
+				key: "testKey3",
+			},
+			expectedRes: expectedRes{
+				remainTime: -2,
+				errorMsg:   nil,
+			},
+		},
+	}
+
+	// iterate to execute all tes case
+	for index, tc := range testCases {
+		fmt.Printf("%d - ", index+1)
+
+		// set key - value - expireTime
+		remainTime, err := RConn.GetRemainLifeTime(tc.args.key)
+
+		// check returned remaining time
+		if remainTime != tc.expectedRes.remainTime {
+			t.Errorf("Fail at [%s], expected remaining time = %v, get remaining time = %v\n", tc.name, tc.expectedRes.remainTime, remainTime)
+			t.Errorf("Error message: %s\n", err)
+			continue
+		}
+
+		// check returned error
+		if err == nil {
+			if tc.expectedRes.errorMsg != nil {
+				t.Errorf("Fail at [%s], expected error = %v, get error = %v\n", tc.name, tc.expectedRes.errorMsg, err)
+				continue
+			}
+		} else {
+			// check returned error (error != nil)
+			if err.Error() != tc.expectedRes.errorMsg.Error() {
+				t.Errorf("Fail at [%s], expected error = %v, get error = %v\n", tc.name, tc.expectedRes.errorMsg, err)
+				continue
+			}
+		}
+
+		// show PASS message if we pass all above check
+		fmt.Printf("%s: PASS\n", tc.name)
+
+		RConn.Delete("testKey3")
 	}
 }
 
@@ -467,5 +563,7 @@ func TestRedisExpire(t *testing.T) {
 
 		// show PASS message if we pass all above check
 		fmt.Printf("%s: PASS\n", tc.name)
+
+		RConn.Delete("testKey1")
 	}
 }

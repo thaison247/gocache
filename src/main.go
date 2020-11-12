@@ -15,7 +15,7 @@ func main() {
 
 	defer rd.Close()
 
-	numb, err := rd.Expire("te", 20)
+	numb, err := rd.GetRemainLifeTime("")
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 	} else {
